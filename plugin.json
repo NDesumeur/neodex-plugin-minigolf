@@ -1,0 +1,22 @@
+{
+  "id": "neodex.minigolf",
+  "name": "Minigolf",
+  "version": "1.0.0",
+  "author": "NDesumeur",
+  "description": "Neuf trous dessinés à la main, avec du sable, de l'eau et des bordures en bois. Tire en arrière pour viser, lâche pour frapper.",
+  "icon": "icon.png",
+  "entry": "index.js",
+  "view": "minigolf",
+  "neobase": ">=4.0.0",
+  "type": "app",
+  "category": "Jeux",
+  "syncMode": "progression",
+  "syncInfo": "Meilleur parcours, trous en un.",
+  "mobile": false,
+  "system": false,
+  "dependencies": {},
+  "sdk": "2.1.0",
+  "permissions": [
+    "storage"
+  ]
+}
