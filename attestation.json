@@ -1,9 +1,9 @@
 {
   "pluginId": "neodex.minigolf",
   "repo": "NDesumeur/neodex-plugin-minigolf",
-  "version": "1.0.0",
-  "sha256": "2041545d63c216267ab2706e75b91e48a41df28b810895d706fc5b7faf95ed75",
-  "approvedAt": "2026-11-07T17:30:59.714Z",
+  "version": "1.0.1",
+  "sha256": "8fe41fabf4d5743a1a764a0453e05c61b95877387af4d4994d1ae0b3c5f6a1a7",
+  "approvedAt": "2026-11-08T12:10:48.501Z",
   "neobase": ">=4.0.0",
-  "signature": "B5KyjOzC4I1KRuZ7PNpQ8/yRBNghhAc29hWG6NYoAlEeJvoPI930PJuBsl54eTxkLvoNtWCEq6vvdHb1TmjADw=="
+  "signature": "YMImFZqJdh5wSiE0oIoyKJ5X+cNwQH/ix31I29KIf4bIaPqYk+vNq7b4J4p9dAhXbMM1sKVUB+q0QBeuunecCQ=="
 }
