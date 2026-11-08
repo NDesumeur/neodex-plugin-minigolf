@@ -3,7 +3,7 @@
   "name": "Minigolf",
   "version": "1.0.0",
   "author": "NDesumeur",
-  "description": "Neuf trous dessinés à la main, avec du sable, de l'eau et des bordures en bois. Tire en arrière pour viser, lâche pour frapper.",
+  "description": "Minigolf de neuf trous (par 31) : clique, tire en arrière pour viser et doser la force, lâche pour frapper. Le sable freine, l'eau ramène la balle avec un coup de pénalité, les bordures font rebondir. Option parcours au hasard avec neuf nouveaux trous à chaque partie ; résultat par trou (birdie, bogey…), meilleur parcours et trous en un.",
   "icon": "icon.png",
   "entry": "index.js",
   "view": "minigolf",
