@@ -24,7 +24,20 @@ Un parcours de minigolf de neuf trous, avec du sable, de l'eau, des obstacles et
 
 Le parcours de base compte neuf trous fixes, du par 2 au par 5, pour un par total de 31 : une ligne droite, des virages, un bunker au milieu, un ruisseau à traverser, un étang avec un seul passage, des plots en quinconce…
 
-Avec l'option **Parcours au hasard**, chaque nouvelle partie crée neuf nouveaux trous : une allée qui serpente, puis du sable, de l'eau ou un obstacle placés sans jamais couper le chemin. Le par (de 2 à 5) dépend de la longueur du trajet, avec un coup de plus s'il y a de l'eau.
+La liste **Parcours** propose aussi :
+
+- **Île aux pirates** : une île de gazon au milieu de la mer, des palmiers, un drapeau pirate, de l'eau partout et des **pont-levis** ;
+- **Banquise** : de la neige, des sapins, des plaques de **glace** où la balle glisse loin, des moulins et des tapis roulants ;
+- **Station spatiale** : des plaques de métal au milieu des étoiles, des **trous noirs** qui attirent la balle et l'avalent (un coup de pénalité), du **vide** qui fait comme l'eau et des tapis roulants ;
+- **Au hasard** : chaque nouvelle partie crée neuf nouveaux trous, avec du sable, de l'eau, des plots et des obstacles qui bougent, placés sans jamais couper le chemin.
+
+Les trois parcours à thème sont toujours les mêmes, pour pouvoir battre ton record sur chacun. Le par (de 2 à 5) dépend de la longueur du trajet, avec un coup de plus s'il y a de l'eau ou plusieurs obstacles qui bougent.
+
+## Les obstacles qui bougent
+
+- **Le moulin** : ses quatre ailes tournent devant la porte ; la balle passe entre deux ailes, sinon elle rebondit.
+- **Le pont-levis** : il se lève régulièrement ; une balle sur le pont ou qui arrive pendant qu'il est levé tombe à l'eau.
+- **Le tapis roulant** : ses flèches avancent et poussent la balle, même arrêtée, jusqu'au bout du tapis.
 
 ## Points
 
@@ -32,11 +45,15 @@ Le haut de l'écran affiche le numéro du trou, son par et tes coups. Chaque tro
 
 ## Statistiques
 
-Meilleur parcours (le moins de coups sur neuf trous), parcours finis, trous en un et total du parcours en cours.
+Meilleur parcours (le moins de coups sur neuf trous, pour le parcours choisi), parcours finis, trous en un et total du parcours en cours.
+
+## Plein écran
+
+Le bouton **Plein écran** agrandit le parcours à tout l'écran (Échap pour en sortir). Hors plein écran, il prend toute la place que laisse la fenêtre, du petit portable au grand écran.
 
 ## Données et synchronisation
 
-Tes statistiques et le choix du parcours au hasard sont enregistrés par NeoDex, sauvegardés et synchronisés entre tes PC si la synchro est activée.
+Tes statistiques et le parcours choisi sont enregistrés par NeoDex, sauvegardés et synchronisés entre tes PC si la synchro est activée.
 
 ## Installer
 

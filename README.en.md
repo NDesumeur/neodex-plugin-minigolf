@@ -24,7 +24,20 @@ A nine-hole minigolf course, with sand, water, obstacles and walls the ball boun
 
 The standard course has nine fixed holes, from par 2 to par 5, for a total par of 31: a straight line, bends, a bunker in the middle, a stream to cross, a pond with a single way through, staggered posts…
 
-With the **Random course** option, each new game creates nine new holes: a winding fairway, then sand, water or an obstacle placed without ever blocking the way. The par (2 to 5) depends on the length of the route, with one more stroke if there is water.
+The **Course** list also offers:
+
+- **Pirate island**: a grass island in the middle of the sea, palm trees, a pirate flag, water everywhere and **drawbridges**;
+- **Ice floe**: snow, fir trees, patches of **ice** where the ball slides far, windmills and conveyor belts;
+- **Space station**: metal plates among the stars, **black holes** that pull the ball in and swallow it (one-stroke penalty), **void** that works like water, and conveyor belts;
+- **Random**: each new game creates nine new holes, with sand, water, posts and moving obstacles, placed without ever blocking the way.
+
+The three themed courses are always the same, so you can beat your record on each. The par (2 to 5) depends on the length of the route, with one more stroke if there is water or several moving obstacles.
+
+## Moving obstacles
+
+- **The windmill**: its four sails turn in front of the door; the ball gets through between two sails, otherwise it bounces back.
+- **The drawbridge**: it rises regularly; a ball on the bridge, or arriving while it is up, falls into the water.
+- **The conveyor belt**: its arrows move and push the ball, even when stopped, to the end of the belt.
 
 ## Scoring
 
@@ -34,9 +47,13 @@ The top of the screen shows the hole number, its par and your strokes. Each fini
 
 Best round (fewest strokes over nine holes), rounds finished, holes in one and the current round's total.
 
+## Full screen
+
+The **Full screen** button fills the whole screen with the course (Escape to leave). Otherwise it takes all the room the window leaves, from a small laptop to a big screen.
+
 ## Data and sync
 
-Your statistics and the random course choice are stored by NeoDex, backed up and synced between your PCs when sync is on.
+Your statistics and the chosen course are stored by NeoDex, backed up and synced between your PCs when sync is on.
 
 ## Install
 
