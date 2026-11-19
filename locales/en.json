@@ -53,7 +53,6 @@
  "Le sable freine beaucoup ; l'eau ramène la balle à l'endroit du tir avec un coup de pénalité.": "The sand slows down a lot; the water returns the ball to the shooting spot with a penalty stroke.",
  "MINIGOLF": "MINIGOLF",
  "Meilleur parcours": "Best course",
- "Meilleur parcours, trous en un.": "Best course, holes in one.",
  "Minigolf": "Minigolf",
  "Minigolf de neuf trous (par 31) : clique, tire en arrière pour viser et doser la force, lâche pour frapper. Le sable freine, l'eau ramène la balle avec un coup de pénalité, les bordures font rebondir. Trois parcours à thème (île aux pirates, banquise, station spatiale) avec des obstacles qui bougent (moulin, pont-levis, tapis roulant), de la glace et des trous noirs, et un parcours au hasard de neuf nouveaux trous à chaque partie ; résultat par trou (birdie, bogey…), meilleur parcours et trous en un ; plein écran et jeu à la taille de l'écran.": "Nine-hole minigolf (par 31): click, pull back to aim and set the power, release to hit. Sand slows the ball, water brings it back with a one-stroke penalty, the borders bounce. Three themed courses (pirate island, ice floe, space station) with moving obstacles (windmill, drawbridge, conveyor belt), ice and black holes, and a random course of nine new holes each game; result per hole (birdie, bogey…), best round and holes in one; full screen and a game that fits the screen.",
  "NOUVELLE PARTIE": "NEW GAME",
@@ -90,5 +89,6 @@
  "moulin fermé": "windmill closed",
  "pont levé": "bridge raised",
  "qui change": "which changes",
- "trou tiré": "hole drawn"
+ "trou tiré": "hole drawn",
+ "Rien n'est synchronisé : tes records restent sur cet appareil.": "Nothing is synced: your records stay on this device."
 }
