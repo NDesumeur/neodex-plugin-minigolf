@@ -25,6 +25,15 @@ module.exports = async ({ pj, sleep }) => {
     }
     await sleep(700); await shot('1-' + c);
   }
+  // à deux : J1 tire, et quand sa balle s'arrête, c'est au tour de J2
+  await C(`T.course('classique'); return 0;`);
+  await pj(`(() => { const s = document.getElementById('mgPlayers'); s.value = '2'; s.dispatchEvent(new Event('change')); })()`); await sleep(200);
+  await pj(`(() => { const c = document.getElementById('gc'), r = c.getBoundingClientRect(), mg = c.__mg.st(), k = r.width / 256, x = r.left + mg.bx * k, y = r.top + mg.by * k;
+    const ev = (t, dx) => c.dispatchEvent(new PointerEvent(t, {clientX: x + dx * k, clientY: y, pointerId: 1, bubbles: true})); ev('pointerdown', 0); ev('pointermove', -20); ev('pointerup', -20); })()`);
+  for (let i = 0; i < 30 && await C('return mg.cur;') !== 1; i++) await sleep(200);
+  await sleep(300); await shot('2-a-deux');
+  const duo = await C(`return mg.n + '|' + mg.cur + '|' + mg.pl[0].strokes;`); if (duo !== '2|1|1') throw new Error('à deux, le tour devait passer à J2 : ' + duo);
+  await pj(`(() => { const s = document.getElementById('mgPlayers'); s.value = '1'; s.dispatchEvent(new Event('change')); })()`);
   await C(`T.course('${keep}'); return 0;`);
   const errs = await pj(`window.__e.join(' | ')`); if (errs) throw new Error('erreur : ' + errs);
   // plein écran, et la zone de jeu qui tient dans la fenêtre

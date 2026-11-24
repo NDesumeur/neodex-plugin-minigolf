@@ -6,6 +6,7 @@ const HTML = `<div class="appWrap wide">
     <div class="gSide">
       <div class="sysCard"><b>RECORDS</b><div class="gStats" id="gStats"></div></div>
       <div class="row"><button class="btn main" id="gNew">NOUVELLE PARTIE</button><button class="btn" id="gFs">PLEIN ÉCRAN</button></div>
+      <label class="row">Joueurs <select class="gSel" id="mgPlayers"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select></label>
       <label class="row">Parcours <select class="gSel" id="mgCourse"><option value="classique">Classique</option><option value="pirate">Île aux pirates</option><option value="glace">Banquise</option><option value="espace">Station spatiale</option><option value="hasard">Au hasard (9 nouveaux trous)</option></select></label>
       <div class="hint">Plus tu tires loin, plus le coup est fort (la jauge passe au rouge au maximum).</div><div class="hint">Le sable freine beaucoup ; l'eau ramène la balle à l'endroit du tir avec un coup de pénalité.</div><div class="hint">Obstacles qui bougent : le moulin ne laisse passer qu'entre ses ailes, le pont-levis se lève (dessous, c'est l'eau), le tapis roulant pousse la balle. Sur la banquise, la glace glisse ; dans l'espace, les trous noirs avalent la balle.</div>
     </div></div>
@@ -399,6 +400,16 @@ function mgRandomHole(R = Math.random, kinds = MG_THEMES.hasard.kinds) {  // un 
   }
 }
 let mg = null;
+// à plusieurs sur le même PC : chacun sa balle (blanche, rouge, bleue, jaune), on joue à tour de rôle ; 10 coups au plus par trou
+const MG_PCOL = ['#ffffff', '#ff6a6a', '#6aa8ff', '#ffd84a'], MG_PF = ['bx', 'by', 'vx', 'vy', 'lastX', 'lastY', 'strokes'], MG_CAP = 10;
+const mgSave = () => MG_PF.forEach(k => mg.pl[mg.cur][k] = mg[k]);
+const mgLoad = i => { mg.cur = i; MG_PF.forEach(k => mg[k] = mg.pl[i][k]); mg.turnAt = mg.tick; };
+const mgSum = p => p.cards.reduce((a, b) => a + (b || 0), 0);
+function mgTurnEnd() {
+  mgSave(); const p = mg.pl[mg.cur]; if (!p.done && p.strokes >= MG_CAP) { p.done = true; p.cards[mg.hole] = MG_CAP; }
+  if (mg.pl.every(q => q.done)) { mg.mode = 'sunk'; mg.sunkAt = mg.tick; if (mg.hole === 8) { mgs.rounds++; saveGames(); } mgInfo(); return; }
+  let i = mg.cur; do i = (i + 1) % mg.n; while (mg.pl[i].done); mgLoad(i);
+}
 const mgTile = (x, y) => mg.map[Math.floor((y - MG.TOP) / MG.T)]?.[Math.floor(x / MG.T)] ?? ' ';
 const mgOpen = c => c !== ' ';
 // le moulin : quatre ailes qui tournent ; la porte est fermée quand une aile passe devant (un peu moins de la moitié du temps)
@@ -411,6 +422,7 @@ function mgHole(n) {
   const [par, map] = mg.holes[n], [tx, ty] = mgFind(map, 'T'), [cx, cy] = mgFind(map, 'O');
   Object.assign(mg, {hole: n, par, map, bx: tx, by: ty, vx: 0, vy: 0, lastX: tx, lastY: ty, cupX: cx, cupY: cy, strokes: 0, aim: null, sunkAt: 0, mode: 'play', splash: 0, bg: null, moveT: 0,
     wells: map.flatMap((r, y) => [...r].map((c, x) => c === 'X' ? [x * MG.T + 8, MG.TOP + y * MG.T + 8] : null)).filter(Boolean)});
+  if (mg.n > 1) { mg.pl = mg.pl.map(p => ({...p, bx: tx, by: ty, vx: 0, vy: 0, lastX: tx, lastY: ty, strokes: 0, done: false})); mg.cur = 0; mg.turnAt = mg.tick; mg.sunkMsg = null; }
 }
 function mgCourse(c) {  // les 9 trous d'un parcours : faits main (classique), tirés une fois pour toutes (thèmes, même graine), ou nouveaux (au hasard)
   const T = MG_THEMES[c] || MG_THEMES.classique;
@@ -418,9 +430,10 @@ function mgCourse(c) {  // les 9 trous d'un parcours : faits main (classique), t
   if (!T.seed) return MG_HOLES;
   const R = seeded(T.seed); return T.holes ??= Array.from({length: 9}, () => mgRandomHole(R, T.kinds));
 }
-function mgNew() { const course = MG_THEMES[mgs.course] ? mgs.course : 'classique'; mg = Object.assign(mg || {tick: 0, raf: 0}, {cards: [], course, th: MG_THEMES[course], holes: mgCourse(course)}); mgHole(0); mgInfo(); }
+function mgNew() { const course = MG_THEMES[mgs.course] ? mgs.course : 'classique', n = mgs.players || 1; mg = Object.assign(mg || {tick: 0, raf: 0}, {cards: [], course, th: MG_THEMES[course], holes: mgCourse(course), n, pl: Array.from({length: n}, () => ({cards: []}))}); mgHole(0); mgInfo(); }
 function mgPenalty(text) { mg.splash = mg.tick; mg.splashText = text; mg.bx = mg.lastX; mg.by = mg.lastY; mg.vx = mg.vy = 0; mg.strokes++; beep(200, .3, 'sine', 80, .1); }
-function mgUpdate() {
+function mgUpdate() { mgPhys(); if (mg.moving && !mg.vx && !mg.vy && mg.mode === 'play') { mg.moving = false; if (mg.n > 1) mgTurnEnd(); } }  // le coup est fini quand la balle s'arrête
+function mgPhys() {
   const t0 = mgTile(mg.bx, mg.by), push = MG_CONV[t0];
   if (t0 === 'B' && mgBridgeUp()) return mgPenalty(mg.th.wet);  // le pont s'est levé sous la balle
   if (push) { mg.vx += push[0] * .045; mg.vy += push[1] * .045; }  // le tapis roulant pousse, même une balle arrêtée
@@ -439,6 +452,7 @@ function mgUpdate() {
   if (Math.hypot(mg.vx, mg.vy) < (MG_CONV[t] ? .01 : .05)) { mg.vx = mg.vy = 0; }
 }
 function mgSunk() {
+  if (mg.n > 1) { const p = mg.pl[mg.cur]; p.done = true; p.cards[mg.hole] = mg.strokes; if (mg.strokes === 1) mgs.aces++; mg.sunkMsg = {t: mg.tick, who: mg.cur, n: mg.strokes}; mg.moving = false; mgTurnEnd(); return; }
   mg.mode = 'sunk'; mg.sunkAt = mg.tick; mg.cards[mg.hole] = mg.strokes; if (mg.strokes === 1) mgs.aces++;
   [659, 784, 988].forEach((f, i) => setTimeout(() => beep(f, .12, 'triangle'), i * 90 + 100));
   if (mg.hole === 8) { const tot = mg.cards.reduce((a, b) => a + b, 0); mgs.rounds++; if (mg.course === 'classique') { if (!mgs.bestRound || tot < mgs.bestRound) mgs.bestRound = tot; } else if (!mgs.best[mg.course] || tot < mgs.best[mg.course]) mgs.best[mg.course] = tot; saveGames(); }
@@ -496,8 +510,16 @@ function mgDraw() {
     for (let i = 1; i <= Math.round(p * 5); i++) if (i % 2) px(g, col, mg.bx + Math.cos(a) * i * 3 - 1, mg.by + Math.sin(a) * i * 3 - 1, 2, 2);
     px(g, '#05010b', 6, H - 10, 52, 6); px(g, col, 7, H - 9, Math.round(50 * p / MG.MAXP), 4);
   }
-  if (mg.mode !== 'sunk' || mg.tick - mg.sunkAt < 6) { px(g, '#05010b', mg.bx - 2, mg.by - 1, 5, 4); px(g, '#05010b', mg.bx - 1, mg.by - 2, 3, 6); px(g, '#ffffff', mg.bx - 1, mg.by - 1, 3, 3); px(g, '#c8c8d8', mg.bx + 1, mg.by + 1, 1, 1); }
-  pxFont(g, 'TROU ' + (mg.hole + 1) + '/9', 6, 11, '#ffffff', 6); pxFont(g, ({classique: '', pirate: 'PIRATES · ', glace: 'BANQUISE · ', espace: 'ESPACE · ', hasard: 'HASARD · '})[mg.course] + 'PAR ' + mg.par, W / 2, 11, '#a8d8a0', 6, 'center'); pxFont(g, 'COUPS ' + mg.strokes, W - 6, 11, '#ffd84a', 6, 'right');
+  if (mg.n > 1) mg.pl.forEach((p, i) => { if (i === mg.cur || p.done) return; px(g, '#05010b', p.bx - 2, p.by - 1, 5, 4); px(g, '#05010b', p.bx - 1, p.by - 2, 3, 6); px(g, MG_PCOL[i], p.bx - 1, p.by - 1, 3, 3); });  // les balles qui attendent leur tour
+  if (mg.mode !== 'sunk' || mg.tick - mg.sunkAt < 6) { px(g, '#05010b', mg.bx - 2, mg.by - 1, 5, 4); px(g, '#05010b', mg.bx - 1, mg.by - 2, 3, 6); px(g, MG_PCOL[mg.n > 1 ? mg.cur : 0], mg.bx - 1, mg.by - 1, 3, 3); px(g, '#c8c8d8', mg.bx + 1, mg.by + 1, 1, 1); }
+  pxFont(g, 'TROU ' + (mg.hole + 1) + '/9', 6, 11, '#ffffff', 6); pxFont(g, ({classique: '', pirate: 'PIRATES · ', glace: 'BANQUISE · ', espace: 'ESPACE · ', hasard: 'HASARD · '})[mg.course] + 'PAR ' + mg.par, W / 2, 11, '#a8d8a0', 6, 'center'); pxFont(g, (mg.n > 1 ? 'J' + (mg.cur + 1) + ' · ' : '') + 'COUPS ' + mg.strokes, W - 6, 11, mg.n > 1 ? MG_PCOL[mg.cur] : '#ffd84a', 6, 'right');
+  if (mg.n > 1 && mg.mode === 'play') { if (mg.sunkMsg && mg.tick - mg.sunkMsg.t < 70) pxFont(g, 'J' + (mg.sunkMsg.who + 1) + ' : DANS LE TROU EN ' + mg.sunkMsg.n, W / 2, 28, MG_PCOL[mg.sunkMsg.who], 8, 'center');
+    else if (mg.tick - mg.turnAt < 60) pxFont(g, 'AU TOUR DE J' + (mg.cur + 1), W / 2, 28, MG_PCOL[mg.cur], 8, 'center'); }
+  if (mg.n > 1 && mg.mode === 'sunk' && mg.tick - mg.sunkAt > 20) {  // le tableau des scores, à la fin de chaque trou
+    const tot = mg.pl.map(mgSum), low = Math.min(...tot), win = tot.filter(t => t === low).length > 1 ? 'ÉGALITÉ !' : 'J' + (tot.indexOf(low) + 1) + ' GAGNE !';
+    gameText(g, W, [[mg.hole < 8 ? 'TROU ' + (mg.hole + 1) + ' FINI' : win, '#ffd84a', 12], ...mg.pl.map((p, i) => ['J' + (i + 1) + ' : ' + p.cards[mg.hole] + ' · total ' + tot[i], MG_PCOL[i]]), [mg.hole < 8 ? 'Clic : trou suivant' : 'Clic : nouveau parcours', '#b8b0c8']], 56);
+    return;
+  }
   if (mg.mode === 'sunk' && mg.tick - mg.sunkAt > 20) {
     const d = mg.strokes - mg.par, word = mg.strokes === 1 ? 'TROU EN UN !' : ['', 'ALBATROS', 'EAGLE', 'BIRDIE', 'PAR', 'BOGEY', 'DOUBLE BOGEY'][4 + Math.max(-3, Math.min(2, d))] || '+' + d;
     if (mg.hole < 8) gameText(g, W, [[word, d < 0 ? '#5fdf6a' : d === 0 ? '#ffffff' : '#ffa030', 12], [mg.strokes + ' coup' + (mg.strokes > 1 ? 's' : ''), '#ffffff'], ['Clic : trou suivant', '#ffd84a']], 70);
@@ -512,11 +534,12 @@ cv.onpointerdown = e => {
 cv.onpointermove = e => { if (!mg?.aim) return; const [x, y] = cpos(e); mg.aim = [mg.start[0] - x, mg.start[1] - y]; };
 cv.onpointerup = () => {
   if (!mg?.aim) return; const [ax, ay] = mg.aim, p = Math.min(MG.MAXP, Math.hypot(ax, ay) / 9); mg.aim = null;
-  if (p < .3) return; const a = Math.atan2(ay, ax); mg.lastX = mg.bx; mg.lastY = mg.by; mg.vx = Math.cos(a) * p; mg.vy = Math.sin(a) * p; mg.moveT = 0; mg.strokes++; beep(500, .04, 'triangle', 300, .08);
+  if (p < .3) return; const a = Math.atan2(ay, ax); mg.lastX = mg.bx; mg.lastY = mg.by; mg.vx = Math.cos(a) * p; mg.vy = Math.sin(a) * p; mg.moveT = 0; mg.strokes++; mg.moving = true; beep(500, .04, 'triangle', 300, .08);
 };
 document.addEventListener('keydown', e => { if (!keyOk(e) || !mg) return; if ((e.key === ' ' || e.key === 'Enter') && mg.mode === 'sunk' && mg.tick - mg.sunkAt > 20) { e.preventDefault(); if (mg.hole < 8) mgHole(mg.hole + 1); else mgNew(); mgInfo(); } });
 function mgInfo() { const bst = !mg || mg.course === 'classique' ? mgs.bestRound : mgs.best[mg.course]; showStats([['Meilleur parcours', bst ? bst + ' coups' : '—'], ['Parcours finis', mgs.rounds], ['Trous en un', mgs.aces], ['Ce parcours', mg ? mg.cards.reduce((a, b) => a + b, 0) + ' coups' : '—']]); }
 $('gNew').onclick = () => { mgNew(); $('gNew').blur(); };
+$('mgPlayers').value = String(mgs.players || 1); $('mgPlayers').onchange = () => { mgs.players = +$('mgPlayers').value; saveGames(); mgNew(); $('mgPlayers').blur(); };
 $('mgCourse').value = MG_THEMES[mgs.course] ? mgs.course : 'classique'; $('mgCourse').onchange = () => { mgs.course = $('mgCourse').value; saveGames(); mgNew(); };
 $('gFs').onclick = () => { $('gFs').blur(); try { if (document.fullscreenElement) document.exitFullscreen(); else cv.parentElement.requestFullscreen?.().catch(() => {}); } catch {} };
 function mgCheck() {  // vérification : les obstacles qui bougent font ce qu'ils disent, chaque parcours à thème a les siens
@@ -531,6 +554,10 @@ function mgCheck() {  // vérification : les obstacles qui bougent font ce qu'il
   lab(['', '  ..........  ', '  .T..*...O.  ', '  ..........  ']); mg.bx = 6 * 16 + 1; mg.by = MG.TOP + 2 * 16 + 8; mg.vx = 1; mgUpdate(); mgUpdate(); const vIce = mg.vx; mg.bx = 3 * 16 + 1; mg.vx = 1; mgUpdate(); mgUpdate(); if (!(vIce > mg.vx)) bad.push('glace');
   for (const [c, need] of [['pirate', /[WB]/], ['glace', /\*/], ['espace', /X/]]) { const holes = mgCourse(c), all = holes.map(h => h[1].join('')).join(''); if (holes.length !== 9 || !need.test(all)) bad.push('parcours ' + c); if (holes !== mgCourse(c)) bad.push('parcours ' + c + ' qui change'); }
   for (let i = 0; i < 20; i++) { const [par, m] = mgRandomHole(Math.random, MG_THEMES[['hasard', 'pirate', 'glace', 'espace'][i % 4]].kinds), at = ch => { const y = m.findIndex(r => r.includes(ch)); return [m[y].indexOf(ch), y]; }; if (mgPath(m, at('T'), at('O')) < 0 || par < 2 || par > 5) bad.push('trou tiré'); }
+  mg = {tick: 0, th: MG_THEMES.hasard, course: 'hasard', holes: [[3, ['', '  ..........  ', '  .T.......O.  ', '  ..........  '].map(r => r.padEnd(16, ' '))]], cards: [], n: 2, pl: [{cards: []}, {cards: []}]}; mgHole(0);
+  mg.vx = 1; mg.moving = true; mg.strokes = 1; step(300); if (mg.cur !== 1 || mg.pl[0].strokes !== 1 || mg.strokes !== 0) bad.push('tour suivant');
+  mg.bx = mg.cupX - 6; mg.by = mg.cupY; mg.vx = 1; mg.moving = true; mg.strokes = 1; step(200); if (!mg.pl[1].done || mg.cur !== 0 || mg.mode !== 'play') bad.push('trou du second');
+  mg.bx = mg.cupX - 6; mg.by = mg.cupY; mg.vx = 1; mg.moving = true; mg.strokes = 2; step(200); if (mg.mode !== 'sunk' || mg.pl[0].cards[0] !== 2 || mg.pl[1].cards[0] !== 1) bad.push('fin du trou à deux');
   mg = keep;
   return bad.length ? [...new Set(bad)].join(', ') : 'ok';
 }

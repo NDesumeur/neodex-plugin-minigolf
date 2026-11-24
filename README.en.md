@@ -4,6 +4,10 @@ A nine-hole minigolf course, with sand, water, obstacles and walls the ball boun
 
 *Version française : [README.md](README.md)*
 
+## Several players (new in 1.2.0)
+
+The **Players** choice (1 to 4) lets several people play on the same PC, taking turns. Each player has their own ball (white, red, blue, yellow); when the ball stops, it is the next player's turn. A player who finished the hole waits for the others (10 strokes at most per hole). After each hole, a board shows everyone's strokes and total, then the winner at the end of the course.
+
 ## How to play
 
 - **Click and hold** anywhere on the course, then **pull back**: dots show the direction of the shot, opposite to your gesture.

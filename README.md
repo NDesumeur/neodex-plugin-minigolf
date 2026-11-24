@@ -4,6 +4,10 @@ Un parcours de minigolf de neuf trous, avec du sable, de l'eau, des obstacles et
 
 *English version: [README.en.md](README.en.md)*
 
+## À plusieurs (nouveau en 1.2.0)
+
+Le choix **Joueurs** (1 à 4) permet de jouer à plusieurs sur le même PC, chacun son tour. Chaque joueur a sa balle (blanche, rouge, bleue, jaune) ; quand la balle s'arrête, c'est au suivant. Celui qui a fini le trou attend les autres (10 coups au plus par trou). À la fin de chaque trou, un tableau donne les coups et le total de chacun, puis le gagnant à la fin du parcours.
+
 ## Comment jouer
 
 - **Clique et maintiens** n'importe où sur le terrain, puis **tire en arrière** : des pointillés montrent la direction du coup, à l'opposé de ton geste.
