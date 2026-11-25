@@ -1,7 +1,7 @@
 {
   "id": "neodex.minigolf",
   "name": "Minigolf",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "author": "NDesumeur",
   "description": "Minigolf de neuf trous (par 31) : clique, tire en arrière pour viser et doser la force, lâche pour frapper. Le sable freine, l'eau ramène la balle avec un coup de pénalité, les bordures font rebondir. Trois parcours à thème (île aux pirates, banquise, station spatiale) avec des obstacles qui bougent (moulin, pont-levis, tapis roulant), de la glace et des trous noirs, et un parcours au hasard de neuf nouveaux trous à chaque partie ; résultat par trou (birdie, bogey…), meilleur parcours et trous en un ; plein écran et jeu à la taille de l'écran. Jusqu'à quatre joueurs sur le même PC, chacun son tour.",
   "icon": "icon.png",
@@ -22,5 +22,47 @@
   "sdk": "2.1.0",
   "permissions": [
     "storage"
+  ],
+  "succes": [
+    {
+      "id": "premier",
+      "nom": "Dix-neuvième trou",
+      "texte": "Finir un premier parcours"
+    },
+    {
+      "id": "ace",
+      "nom": "Trou en un !",
+      "texte": "Faire un trou en un"
+    },
+    {
+      "id": "aces10",
+      "nom": "Chanceux… ou doué",
+      "texte": "Faire 10 trous en un"
+    },
+    {
+      "id": "par",
+      "nom": "Dans le par",
+      "texte": "Finir le parcours classique en 31 coups ou moins"
+    },
+    {
+      "id": "sous-par",
+      "nom": "Champion du club",
+      "texte": "Finir le parcours classique en 25 coups ou moins",
+      "cache": true
+    },
+    {
+      "id": "vingt",
+      "nom": "Habitué du green",
+      "texte": "Finir 20 parcours"
+    }
+  ],
+  "records": [
+    {
+      "id": "classique",
+      "nom": "Parcours classique",
+      "sens": "bas",
+      "format": "nombre",
+      "unite": "coups"
+    }
   ]
 }

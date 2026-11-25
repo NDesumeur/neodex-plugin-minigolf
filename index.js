@@ -300,6 +300,9 @@ export default async function (ctx) {
   const saveGames = () => { clearTimeout(gamesTimer); gamesTimer = setTimeout(() => { gamesTimer = null; folder.write('games', games).catch(() => {}); }, 500); };
   const best = (k, v) => { const b = games.best[k]; if (b == null || v > b) { games.best[k] = v; saveGames(); return true; } return false; };
   const gstore = (k, init) => (games[k] ??= init);
+  // les trophées de NeoDex (3.4.8 et plus) : succès et records déclarés dans plugin.json ; sur un NeoDex plus ancien, rien ne se passe
+  const trophy = id => { ctx.games?.unlock(id).catch(() => {}); };
+  const trophyRecord = (id, v) => { if (v != null && Number.isFinite(+v)) ctx.games?.record(id, +v).catch(() => {}); };
 function gameLoop(st, appKey, update, draw) {
   cancelAnimationFrame(st.raf);
   const STEP = 1000 / 60; let acc = 0, last = performance.now();
@@ -537,7 +540,8 @@ cv.onpointerup = () => {
   if (p < .3) return; const a = Math.atan2(ay, ax); mg.lastX = mg.bx; mg.lastY = mg.by; mg.vx = Math.cos(a) * p; mg.vy = Math.sin(a) * p; mg.moveT = 0; mg.strokes++; mg.moving = true; beep(500, .04, 'triangle', 300, .08);
 };
 document.addEventListener('keydown', e => { if (!keyOk(e) || !mg) return; if ((e.key === ' ' || e.key === 'Enter') && mg.mode === 'sunk' && mg.tick - mg.sunkAt > 20) { e.preventDefault(); if (mg.hole < 8) mgHole(mg.hole + 1); else mgNew(); mgInfo(); } });
-function mgInfo() { const bst = !mg || mg.course === 'classique' ? mgs.bestRound : mgs.best[mg.course]; showStats([['Meilleur parcours', bst ? bst + ' coups' : '—'], ['Parcours finis', mgs.rounds], ['Trous en un', mgs.aces], ['Ce parcours', mg ? mg.cards.reduce((a, b) => a + b, 0) + ' coups' : '—']]); }
+function mgInfo() {
+  setTimeout(mgTrophies); const bst = !mg || mg.course === 'classique' ? mgs.bestRound : mgs.best[mg.course]; showStats([['Meilleur parcours', bst ? bst + ' coups' : '—'], ['Parcours finis', mgs.rounds], ['Trous en un', mgs.aces], ['Ce parcours', mg ? mg.cards.reduce((a, b) => a + b, 0) + ' coups' : '—']]); }
 $('gNew').onclick = () => { mgNew(); $('gNew').blur(); };
 $('mgPlayers').value = String(mgs.players || 1); $('mgPlayers').onchange = () => { mgs.players = +$('mgPlayers').value; saveGames(); mgNew(); $('mgPlayers').blur(); };
 $('mgCourse').value = MG_THEMES[mgs.course] ? mgs.course : 'classique'; $('mgCourse').onchange = () => { mgs.course = $('mgCourse').value; saveGames(); mgNew(); };
@@ -567,6 +571,13 @@ cv.__mg = {st: () => mg, check: mgCheck, course: c => { $('mgCourse').value = c;
   const at = (m, ch) => { const y = m.findIndex(r => r.includes(ch)); return y < 0 ? null : [m[y].indexOf(ch), y]; };
   const ok = [...MG_HOLES, ...Array.from({length: 30}, mgRandomHole)].map(([par, m]) => m.length === 11 && m.every(r => r.length === 16) && m.join('').split('O').length === 2 && at(m, 'T') && par >= 2 && par <= 5 && mgPath(m, at(m, 'T'), at(m, 'O')) > 0);
   console.assert(ok.every(Boolean), 'minigolf', ok);
+}
+// les trophées, tirés des statistiques et des records gardés (aussi à l'ouverture : ce qui a été fait avant compte)
+function mgTrophies() {
+  const b = mgs.bestRound, sig = [b, mgs.rounds, mgs.aces].join(); if (sig === mgTrophies.sig) return; mgTrophies.sig = sig;
+  trophyRecord('classique', b || null);
+  if (mgs.rounds >= 1) trophy('premier'); if (mgs.aces >= 1) trophy('ace'); if (mgs.aces >= 10) trophy('aces10');
+  if (b && b <= 31) trophy('par'); if (b && b <= 25) trophy('sous-par'); if (mgs.rounds >= 20) trophy('vingt');
 }
 ctx.onOpen(() => { if (!mg) mgNew(); gameLoop(mg, 'minigolf', mgUpdate, mgDraw); mgInfo(); });
 
